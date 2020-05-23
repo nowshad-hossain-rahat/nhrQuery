@@ -1,4 +1,4 @@
-# nhrQuery.js-v1.0
+# nhr.js-v1.0
 A JavaScript DOM manipulation library same as jQuery but quite smaller in size.
 
 * Add this to your project
