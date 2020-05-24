@@ -1,5 +1,5 @@
 /*
-	Name : nhr.js
+	Name : nhrQuery.js
 	Version : 1.0
 	Author : Nowshad Hossain Rahat
 	Type : JavaScript Library (Same as JQuery)
@@ -12,7 +12,7 @@
 
 
 
-/* THE LIST OBJECT */
+/* THE LIST OBJECT (same as JavaScript "Set" API */
 
 function List(arr){	
 	let listArray=[];
