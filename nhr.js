@@ -25,10 +25,8 @@ function List(arr){
 	}
 	
 	let listProperties={
-	  add:(item)=>
-	  {
-	    if(listArray.indexOf(item)<0)
-	    {
+	  add:(item)=>{
+	    if(listArray.indexOf(item)<0){
 	      listArray.push(item);
 	    }
 	    return nhr.extend(listProperties);
@@ -293,14 +291,32 @@ const nhr = {
 	
 	isElementNode:(node)=>{ return (node.nodeType===9||node.nodeType===1||node.nodeType===11) ? true:false; },
 	
+	log:(txt)=>{console.log(txt)},
 	
 	/* This metgod provides an object containing some other methods to add,remove,fire and so on for callback methods */
 	
 	Callbacks:function(flags){		
-		let l = [];let fls = new List(flags.split(' '));		
+		
+		/* callback functions container */
+		
+		let l = []; let locked = false; let fired = false; let disabled = false; let totalFired = 0;
+		
+		flags = flags||""; let fbl = true; let fls = new List(flags.split(' '));		
+		
 		const ms={
-			has:(f)=>{return (nhr.inArray(f,l)>-1)},
-			add:(...funcs)=>{
+			disable:()=>{disabled=true;return nhr.extend(ms)},
+			disabled:()=>disabled,
+			enable:()=>{disabled=false;return nhr.extend(ms)}
+		};
+	
+		ms.has=(f)=>{
+			if(!disabled){
+				let b = 0;for(let ff of l){if(ff===f){b++;}}
+				return (b>0);
+			}
+		};
+		ms.add=(...funcs)=>{
+			if(!disabled){
 				if(fls.has("unique")){
 					for(let f of funcs){ if(!ms.has(f)&&nhr.isFunction(f)){l.push(f)} }
 				}else{
@@ -311,22 +327,50 @@ const nhr = {
 					}
 				}
 				return nhr.extend(ms);
-			},
-			remove:(f)=>{
-				if(ms.has(f)){
-					l.splice(l.indexOf(f),1);
-				}
-				return nhr.extend(ms);
-			},
-			fire:(...p)=>{
-				if(l.length>0){
-					for(let func of l){
-						let b = func(p);
-						if(fls.has("stopOnFalse") && nhr.isBoolean(b) && b===false){ return; }
-					}
-				}
 			}
 		};
+		ms.remove=(...funcs)=>{
+			if(!disabled){
+				for(let f of funcs){
+					if(ms.has(f)){
+						let i = l.indexOf(f);
+						while(i>(-1)){
+							if(i===(-1)){return}
+							l.splice(i,1);
+							i = l.indexOf(f);
+						}
+					}
+				}
+				return nhr.extend(ms);
+			}
+		};
+		ms.lock=()=>{
+			if(!disabled){
+				locked=true;
+				return nhr.extend(ms);
+			}
+		};
+		ms.unlock=()=>{ if(!disabled){ locked=false;return nhr.extend(ms); } };
+		ms.locked=()=>{ if(!disabled){ return locked } };
+		ms.fire=(...p)=>{
+			if(!disabled){
+				if(fls.has('once')){ fbl = (totalFired===0) ? true:false; }else{ fbl = true; }
+				if(l.length>0 && fbl){
+					fired = true;
+					for(let func of l){
+						if(!locked){
+							let b = func(p);
+							if(fls.has("stopOnFalse") && nhr.isBoolean(b) && b===false){ return; }
+							totalFired++;
+						}
+					}
+				}
+				return nhr.extend(ms);
+			}
+		};
+		ms.fired=()=>{ if(!disabled){ return fired } };
+		ms.empty=()=>{ if(!disabled){ while(l.length>0){l.pop()} } };
+		
 		return nhr.extend(ms);
 	},
 	
@@ -463,6 +507,9 @@ const n=nhrQuery=(function(){
     	
 		let self=[];
 		
+		self.version = "1.0";
+		self.author = "Nowshad Hossain Rahat";		
+		
 		if(selector===doc||selector===page||selector===document){
 		    
 		    self.doc=selector;
@@ -574,12 +621,11 @@ const n=nhrQuery=(function(){
 	 						});
 	 					}catch(e){}
 	 				});
-	 			}
-	 			else if(nhr.isString(event) && !fun){
+	 			}else if(nhr.isString(event) && !fun){
+	 				
 	 				for(let i of elms){i.dispatchEvent(new Event(event))}
-	 			}
-	 			else if(nhr.isObject(event) && !fun)
-	 			{
+	 			
+	 			}else if(nhr.isObject(event) && !fun){
 	 				for(let i of elms){
 		 				for(let ev in event){
 		 					try{
@@ -617,6 +663,8 @@ const n=nhrQuery=(function(){
 			
 			self.mouseup=(fun)=>{self.on('mouseup',fun);return nhr.extend(self);}
 						
+			self.mousemove=(fun)=>{self.on('mousemove',fun);return nhr.extend(self);}
+			
 			self.hover=(hoverIn,hoverOut)=>{self.mouseenter(hoverIn).mouseleave(hoverOut);}
 			
 			self.keypress=(fun)=>{self.on('keypress',fun);return nhr.extend(self);}
@@ -1870,12 +1918,27 @@ const n=nhrQuery=(function(){
 			
 			/* returns 'true' if at least one of the element is matched against the given selector or elements from the set of matched elements */
 			
-			self.is=(s)=>{
+			self.is = (s)=>{
 				return self.filter(s).length>0;
 			};
 			
 			
-			self.not=(cond)=>{
+			self.slice = (s,e)=>{ 
+				let sliced = new List(elms);
+				preSet.clear().join(self);
+				nhr.clear(self);
+				s = (nhr.isNumeric(s)) ? s:0;
+				e = (nhr.isNumeric(e)) ? e:self.length;
+				if(s<e){
+					for(;s<e;s++){ self.push(sliced.get(s)); }
+				}
+				return nhr.extend(self); 
+			};
+			
+			
+			/* return a set of matched elements which doesn't match the condition */
+			
+			self.not = (cond)=>{
 				let list=new List();
 				let selfList=new List(elms);				
 				try{
