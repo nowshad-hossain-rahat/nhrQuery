@@ -877,7 +877,7 @@ const n=nhrQuery=(function(){
 			self.enabled=()=>{self.prop("disabled",false)};
 		    
 		    
-			self.formData = () => {
+			self.serialize = () => {
 				let str = {};
 				for(let elm of elms[0].querySelectorAll("input,select,textarea")){
 					if(elm["type"]!="submit"){		
@@ -2061,13 +2061,14 @@ nhrQuery.ajax=(dataSet)=>{
 			let url = dataSet.url;
 			let async = (dataSet.async) ? dataSet.async:true;
 			let type = (dataSet.type && dataSet.type.toUpperCase() == "GET" ) ? "GET":"POST";
-			let contentType = (typeof dataSet.contentType==="string") ? dataSet.contentType:"application/x-www-form-urlencoded";
+			let contentType = (dataSet.contentType && typeof dataSet.contentType==="string") ? dataSet.contentType:"application/x-www-form-urlencoded; charset=UTF-8";
 			let user = dataSet.username;
 			let pass = dataSet.password;
-			let datas = (typeof dataSet.data==="object") ? dataSet.data:{};
+			let datas = (typeof dataSet.data == "object") ? dataSet.data:{};
 			let dataType = (typeof dataSet.dataType==="string") ? dataSet.dataType:'text';
 			
-			if(type==="GET"){
+			// if the request method is get then parse the data with url
+			if(type === "GET"){
 				url += "?";
 				for(let k in datas){
 					let amp = (k==datas[datas.length - 1]) ? '':'&';
@@ -2077,63 +2078,79 @@ nhrQuery.ajax=(dataSet)=>{
 			
 			
 				
-				let xhr = new XMLHttpRequest();
-				
-				if(typeof(user)==="string" && typeof(pass)==="string"){
-					xhr.open(type,url,async,user,pass);
-				}else{
-					xhr.open(type,url,async);
-				}
-				
-				if(type==="POST"){ xhr.setRequestHeader("Content-type",contentType); }
-				
-				xhr.onloadstart=()=>{
-					if(dataSet.beforeSend){ dataSet.beforeSend(xhr) }
-				}
-				
-				xhr.onreadystatechange=()=>{
-					console.log(xhr.status);
-					if(xhr.readyState==4 && xhr.status==200 || xhr.status==0){				
-						
-						let rspns=xhr.response;
-						
-						let xhrObj=nhr.extend(xhr,{response:rspns,status:200,statusText:"success"});
-						if(dataSet.success){
-							dataSet.success(xhrObj.response,xhrObj.statusText,xhrObj);
-						}
-					}
-				}
-				
-				xhr.onerror=()=>{			
-					let xhrObj=nhr.extend(xhr,{statusText:"error"});
-					if(dataSet.error){
-						dataSet.error(xhrObj,xhrObj.statusText,xhrObj.statusText);
-					}
-				}
-				
-				xhr.onloadend=()=>{					
-					let statusText=(xhr.readyState==4 && xhr.status==200 || xhr.status==0) ? "success":"error";
-					let xhrObj=nhr.extend(xhr,{statusText:statusText});
-					
-					if(dataSet.complete){
-						dataSet.complete(xhrObj,xhrObj.statusText);
-					}
-				}
-				
-				if(type==="POST"){
+			let xhr = new XMLHttpRequest();
+			
+			if(typeof(user)==="string" && typeof(pass)==="string"){
 
-					let formData = new FormData();
+				xhr.open(type,url,async,user,pass);
 
+			}else{
+
+				xhr.open(type,url,async);
+
+			}
+			
+
+
+			if( type === 'POST' ){
+
+				// encoding the data as uri component
+				let uriEncodedDataPairs = [];
+
+				if( ! ( datas instanceof FormData ) ){
+					xhr.setRequestHeader("Content-Type", contentType);
 					for(let name in datas){
-
-						formData.append(name, datas[name]);
-
+						uriEncodedDataPairs.push( encodeURIComponent(name) + '=' + encodeURIComponent(datas[name]) );
 					}
-
-					xhr.send(formData);
-				}else{
-					xhr.send(null);
+					datas = uriEncodedDataPairs.join('&').replace(/%20/g, '+');
 				}
+					
+			}
+
+
+			
+			// before sending the data
+			xhr.onloadstart = () => {
+				if(dataSet.beforeSend){ dataSet.beforeSend(xhr) }
+			}
+			
+
+			// while the states are changing
+			xhr.onreadystatechange = () => {
+				console.log(xhr.status);
+				if(xhr.readyState==4 && xhr.status==200 || xhr.status==0){				
+					
+					let rspns=xhr.response;
+					
+					let xhrObj=nhr.extend(xhr,{response:rspns,status:200,statusText:"success"});
+					if(dataSet.success){
+						dataSet.success(xhrObj.response,xhrObj.statusText,xhrObj);
+					}
+				}
+			}
+			
+
+			// when something wrong happens
+			xhr.onerror = () => {			
+				let xhrObj=nhr.extend(xhr,{statusText:"error"});
+				if(dataSet.error){
+					dataSet.error(xhrObj,xhrObj.statusText,xhrObj.statusText);
+				}
+			}
+			
+
+			// after the request is completed
+			xhr.onloadend = () => {					
+				let statusText=(xhr.readyState==4 && xhr.status==200 || xhr.status==0) ? "success":"error";
+				let xhrObj=nhr.extend(xhr,{statusText:statusText});
+				
+				if(dataSet.complete){
+					dataSet.complete(xhrObj,xhrObj.statusText);
+				}
+			}
+			
+			// sending the data to the url
+			xhr.send( (type === 'POST') ? datas:null );
 							
 		}
 		
