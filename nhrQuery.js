@@ -877,6 +877,22 @@ const n=nhrQuery=(function(){
 			self.enabled=()=>{self.prop("disabled",false)};
 		    
 		    
+			self.formData = () => {
+				let str = {};
+				for(let elm of elms[0].querySelectorAll("input,select,textarea")){
+					if(elm["type"]!="submit"){		
+						if((elm["name"]!=""||elm["name"]!=null)){
+							if(elm["type"]=="file"){
+								str[elm["name"]] = elm.files[0];
+							}else{
+								str[elm["name"]] = elm["value"];
+							}
+						}
+					}
+				}
+				return str;
+			};
+
 		    
 		    self.css=(prop,val)=>{
 		    	if(nhr.isString(prop) && nhr.isFunction(val)){
@@ -2044,7 +2060,7 @@ nhrQuery.ajax=(dataSet)=>{
 			
 			let url = dataSet.url;
 			let async = (dataSet.async) ? dataSet.async:true;
-			let type = (dataSet.type==="GET") ? "GET":"POST";
+			let type = (dataSet.type && dataSet.type.toUpperCase() == "GET" ) ? "GET":"POST";
 			let contentType = (typeof dataSet.contentType==="string") ? dataSet.contentType:"application/x-www-form-urlencoded";
 			let user = dataSet.username;
 			let pass = dataSet.password;
@@ -2052,9 +2068,10 @@ nhrQuery.ajax=(dataSet)=>{
 			let dataType = (typeof dataSet.dataType==="string") ? dataSet.dataType:'text';
 			
 			if(type==="GET"){
-				url+="?";
+				url += "?";
 				for(let k in datas){
-					url+=k+'='+datas[k]+'&';
+					let amp = (k==datas[datas.length - 1]) ? '':'&';
+					url+=k+'='+datas[k]+amp;
 				}
 			}
 			
@@ -2068,10 +2085,10 @@ nhrQuery.ajax=(dataSet)=>{
 					xhr.open(type,url,async);
 				}
 				
-				if(type==="POST"){ xhr.setRequestHeader("Content-Type",contentType); }
+				if(type==="POST"){ xhr.setRequestHeader("Content-type",contentType); }
 				
 				xhr.onloadstart=()=>{
-					if(dataSet.beforeSend){dataSet.beforeSend()}
+					if(dataSet.beforeSend){ dataSet.beforeSend(xhr) }
 				}
 				
 				xhr.onreadystatechange=()=>{
@@ -2104,7 +2121,16 @@ nhrQuery.ajax=(dataSet)=>{
 				}
 				
 				if(type==="POST"){
-					xhr.send(datas);
+
+					let formData = new FormData();
+
+					for(let name in datas){
+
+						formData.append(name, datas[name]);
+
+					}
+
+					xhr.send(formData);
 				}else{
 					xhr.send(null);
 				}
@@ -2118,8 +2144,3 @@ nhrQuery.ajax=(dataSet)=>{
 /* Adding all the object properties of "nhr" to "nhrQuery" */
 
 nhr.extend(nhrQuery,nhr);
-
-
-
-
-
