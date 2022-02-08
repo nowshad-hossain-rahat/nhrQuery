@@ -2117,7 +2117,7 @@ nhrQuery.ajax=(dataSet)=>{
 
 			// while the states are changing
 			xhr.onreadystatechange = () => {
-				console.log(xhr.status);
+				
 				if(xhr.readyState==4 && xhr.status==200 || xhr.status==0){				
 					
 					let rspns=xhr.response;
