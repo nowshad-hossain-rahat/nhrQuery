@@ -679,8 +679,6 @@ const n=nhrQuery=(function(){
 			
 			self.blur=(fun)=>{self.on('blur',fun);return nhr.extend(self);}
 					
-			
-			
 			/* DOM Manipulation */
 			
 			
@@ -688,6 +686,7 @@ const n=nhrQuery=(function(){
 			
 			self.get=()=>nhr.merge(elms);
 			
+			self.size = () => elms.length;
 			
 			self.val=(value)=>{
 				if(value==undefined){
@@ -2052,7 +2051,8 @@ const n=nhrQuery=(function(){
 })();
 
 
-nhrQuery.ajax=(dataSet)=>{
+// ajax request handler method
+nhrQuery.ajax = function(dataSet){
 	
 	if(dataSet && typeof(dataSet)==='object'){
 		
@@ -2071,7 +2071,9 @@ nhrQuery.ajax=(dataSet)=>{
 			if(type === "GET"){
 				url += "?";
 				for(let k in datas){
-					let amp = (k==datas[datas.length - 1]) ? '':'&';
+					let lastKey = Object.keys(datas)[Object.keys(datas).length - 1];
+					console.log(lastKey, ' : ', k);
+					let amp = (k == lastKey) ? '':'&';
 					url+=k+'='+datas[k]+amp;
 				}
 			}
@@ -2155,10 +2157,11 @@ nhrQuery.ajax=(dataSet)=>{
 		}
 		
 	}
+
+	this.toString = 'function(){[native-code]}';
 	
 }
 
 /* Adding all the object properties of "nhr" to "nhrQuery" */
 
 nhr.extend(nhrQuery,nhr);
-
