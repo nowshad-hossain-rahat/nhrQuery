@@ -2072,7 +2072,6 @@ nhrQuery.ajax = function(dataSet){
 				url += "?";
 				for(let k in datas){
 					let lastKey = Object.keys(datas)[Object.keys(datas).length - 1];
-					console.log(lastKey, ' : ', k);
 					let amp = (k == lastKey) ? '':'&';
 					url+=k+'='+datas[k]+amp;
 				}
