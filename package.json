@@ -1,11 +1,9 @@
 {
   "name": "nhrquery",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is a custom alternative of jQuery with same functionalities.",
   "main": "nhrQuery.js",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/nowshad-hossain-rahat/nhrQuery.git"
