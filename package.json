@@ -1,0 +1,22 @@
+{
+  "name": "nhrquery",
+  "version": "1.0.0",
+  "description": "This is a custom alternative of jQuery with same functionalities.",
+  "main": "nhrQuery.js",
+  "scripts": {
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nowshad-hossain-rahat/nhrQuery.git"
+  },
+  "keywords": [
+    "nhrQuery"
+  ],
+  "author": "Nowshad Hossain Rahat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nowshad-hossain-rahat/nhrQuery/issues"
+  },
+  "homepage": "https://github.com/nowshad-hossain-rahat/nhrQuery#readme"
+}
