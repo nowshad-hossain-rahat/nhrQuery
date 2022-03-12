@@ -1,6 +1,6 @@
 {
   "name": "nhrquery",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "This is a custom alternative of jQuery with same functionalities.",
   "main": "nhrQuery.js",
   "scripts": {},
