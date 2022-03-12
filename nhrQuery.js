@@ -499,7 +499,7 @@ function log(txt){ console.log(txt) }
 
 const doc = page = document;
 
-const n = nhrQuery = (function(){
+const n = (function(){
     
     function Constructor(selector,ct){
     	    	
@@ -2160,6 +2160,8 @@ nhrQuery.ajax = function(dataSet){
 	this.toString = 'function(){[native-code]}';
 	
 }
+
+const nhrQuery = n;
 
 /* Adding all the object properties of "nhr" to "nhrQuery" */
 
