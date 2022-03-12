@@ -2170,4 +2170,4 @@ nhrQuery.ajax = function(dataSet){
 
 nhr.extend(nhrQuery,nhr);
 
-export {nhr, n, nhrQuery, List, HashMap, doc, page, log};
+export {n, nhrQuery, List, HashMap, doc, page, log};
