@@ -2052,6 +2052,10 @@ const n = (function(){
 })();
 
 
+// the nhrQuery object
+const nhrQuery = n;
+
+
 // ajax request handler method
 nhrQuery.ajax = function(dataSet){
 	
@@ -2161,8 +2165,6 @@ nhrQuery.ajax = function(dataSet){
 	this.toString = 'function(){[native-code]}';
 	
 }
-
-const nhrQuery = n;
 
 /* Adding all the object properties of "nhr" to "nhrQuery" */
 
