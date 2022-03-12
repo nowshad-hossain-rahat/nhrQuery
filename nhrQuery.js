@@ -497,7 +497,8 @@ function log(txt){ console.log(txt) }
 
 /* nhrQuery method */
 
-const doc = page = document;
+const doc = document;
+const page = document;
 
 const n = (function(){
     
