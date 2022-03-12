@@ -14,7 +14,7 @@
 
 /* THE LIST OBJECT (same as JavaScript "Set" API */
 
-export function List(arr){	
+function List(arr){	
 	let listArray=[];
 	if(arr)
 	{
@@ -91,7 +91,7 @@ export function List(arr){
 /* THE MAP OBJECT */
 
 
-export function HashMap(arr){	
+function HashMap(arr){	
 	let listArray=[];
 	if(arr!=undefined)
 	{
@@ -214,7 +214,7 @@ export function HashMap(arr){
 
 
 
-export const nhr = {
+const nhr = {
 
 	/* Utility functions */
 	
@@ -497,7 +497,7 @@ function log(txt){ console.log(txt) }
 
 /* nhrQuery method */
 
-const doc=page=document;
+const doc = page = document;
 
 const n = nhrQuery = (function(){
     
@@ -2165,4 +2165,4 @@ nhrQuery.ajax = function(dataSet){
 
 nhr.extend(nhrQuery,nhr);
 
-export default nhr;
+export {nhr, n, nhrQuery, List, HashMap, doc, page, log};
